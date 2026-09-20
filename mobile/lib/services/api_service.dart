@@ -7,6 +7,7 @@ import '../models/assessment_model.dart';
 import 'secure_auth_store.dart';
 
 class ApiService {
+  static const String configuredBaseUrl = String.fromEnvironment('PRAHARI_API_URL');
   static final ApiService _instance = ApiService._internal();
   factory ApiService() => _instance;
   ApiService._internal();
@@ -15,6 +16,9 @@ class ApiService {
   String? _token;
 
   String get defaultBaseUrl {
+    if (configuredBaseUrl.isNotEmpty) {
+      return configuredBaseUrl.replaceAll(RegExp(r'/+$'), '');
+    }
     if (kIsWeb) {
       final host = Uri.base.host.isNotEmpty ? Uri.base.host : 'localhost';
       return 'http://$host:8000/api';
@@ -31,7 +35,12 @@ class ApiService {
   String get baseUrl => _customBaseUrl.isNotEmpty ? _customBaseUrl : defaultBaseUrl;
 
   Future<void> setCustomBaseUrl(String url) async {
-    _customBaseUrl = url.trim().replaceAll(RegExp(r'/+$'), '');
+    final normalized = url.trim().replaceAll(RegExp(r'/+$'), '');
+    final parsed = Uri.tryParse(normalized);
+    if (parsed == null || parsed.host.isEmpty || !['http', 'https'].contains(parsed.scheme)) {
+      throw ArgumentError('API URL must be an absolute http(s) URL');
+    }
+    _customBaseUrl = normalized;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('custom_base_url', _customBaseUrl);
   }
