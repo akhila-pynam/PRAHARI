@@ -1,7 +1,7 @@
 {
   "model_version": "v2.0-defense-calibrated",
   "model_architecture": "Calibrated Regularized Gradient Boosted Trees (XGBoost 3.4)",
-  "trained_at": "2026-09-20T07:20:24.832855+00:00",
+  "trained_at": "2026-09-20T10:11:33.346412+00:00",
   "total_features": 26,
   "dataset": {
     "total_samples": 1000,
